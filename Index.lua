@@ -40,15 +40,9 @@ ConnectionManager.__index = ConnectionManager;
 --------------------------
 
 type ConnectionManager = {
-	
 	-- Core Data
-	Connections : {
-		[string] : RBXScriptConnection
-	},
-	
-	IDs : {
-		[RBXScriptConnection] : string
-	},
+	Connections : {[string] : RBXScriptConnection},
+	IDs : {[RBXScriptConnection] : string},
 	
 	-- Extra Data
 	Created : number,
@@ -62,10 +56,8 @@ type ConnectionManager = {
 
 -- Replicate `assert` functionality, but using a `warning` instead of an `error`.
 local function WarnAssert(Condition : boolean?, Output : string?) : nil?
-	
 	-- Check that the `Condition` is either `false` or `nil`.
 	if not (Condition) then
-		
 		-- If so, then push a warning.
 		warn(Output or tostring(Condition) or "");
 	end;
@@ -77,11 +69,9 @@ end;
 
 -- Create a new `ConnectionManager`.
 function ConnectionManager.new() : ConnectionManager
-	
 	-- Initalize a table containing
 	-- basic structure of a `ConnectionManager`.
 	local self : ConnectionManager = setmetatable({
-		
 		-- Core data
 		["Connections"] = {},
 		["IDs"] = {},
@@ -90,7 +80,6 @@ function ConnectionManager.new() : ConnectionManager
 		["Created"] = 0,
 		["Updated"] = 0,
 		["Size"] = 0
-		
 	}, ConnectionManager);
 	
 	-- Retrive the current time,
@@ -112,7 +101,6 @@ end;
 
 -- Adds an active connection to the current ConnectionManager.
 function ConnectionManager:Cache(Connection : RBXScriptConnection?) : (string, boolean)
-	
 	-- Check if the `Connection` provided is a `RBXScriptConnection`.
 	local ValidConnection : boolean = typeof(Connection) == "RBXScriptConnection";
 	
@@ -121,7 +109,6 @@ function ConnectionManager:Cache(Connection : RBXScriptConnection?) : (string, b
 	
 	-- If it is, then continue.
 	if (ValidConnection) then
-		
 		-- First, check that the `Connection` hasn't already 
 		-- been disconnected. if it has, then push an error.
 		assert(ValidConnection.Connected, "Attempted to cache a `RBXScriptConnection` which has already been disconnected.");
@@ -149,7 +136,6 @@ end;
 
 -- Disconnects an active connection given either an ID or a RBXScriptConnection.
 function ConnectionManager:Disconnect(Input : (string | RBXScriptConnection)?) : boolean
-	
 	-- Check if the input provided was a string.
 	local IsStringInput : boolean = typeof(Input) == "string";
 	
@@ -161,7 +147,6 @@ function ConnectionManager:Disconnect(Input : (string | RBXScriptConnection)?) :
 	
 	-- If the input is "currently" valid.
 	if (ValidInput) then
-		
 		-- Then check one more time.
 		ValidInput = if (typeof(Input) == "string") then (#Input == 32) else (true);
 	end;
@@ -171,13 +156,11 @@ function ConnectionManager:Disconnect(Input : (string | RBXScriptConnection)?) :
 	
 	-- Check if the input if valid.
 	if (ValidInput) then
-		
 		-- Then check if it's in the current `ConnectionManager`'s Cache.
 		local IsInCache : boolean = self[ if (IsStringInput) then ("Connections") else ("IDs") ][Input] ~= nil;
 		
 		-- If it is in the Cache.
 		if (IsInCache) then
-			
 			-- Then retrive both the `Connection` and it's `ID`.
 			local ID : string = if (IsStringInput) then (Input) else (self.IDs[Input]);
 			local Connection : RBXScriptConnection = self.Connections[ID];
@@ -206,16 +189,13 @@ end;
 
 -- Disconnects all active connections.
 function ConnectionManager:DisconnectAll() : boolean
-	
 	-- Iterate over every active connection.
 	for _, Connection in pairs(self.Connections) do
-		
 		-- Fire the `:Disconnect` method, provided the current `Connection`.
 		local Success : boolean = self:Disconnect(Connection);
 		
 		-- If the `Connection` did not disconnect successfully.
 		if not (Success) then 
-			
 			-- Then
 			return (false);
 		end;
